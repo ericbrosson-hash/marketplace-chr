@@ -103,12 +103,21 @@ export default async function Annonces() {
                 style={{ background: 'var(--chr-card)', border: '1px solid var(--chr-border)' }}
               >
                 {/* Zone photo */}
-                <div
-                  className="h-36 flex items-center justify-center text-xs"
-                  style={{ background: 'var(--chr-bg)', borderBottom: '1px solid var(--chr-border)', color: '#C0BDB7' }}
-                >
-                  Aucune photo
-                </div>
+                {annonce.photos && annonce.photos.length > 0 ? (
+                  <img
+                    src={annonce.photos[0]}
+                    alt={annonce.titre}
+                    className="h-36 w-full object-cover"
+                    style={{ borderBottom: '1px solid var(--chr-border)' }}
+                  />
+                ) : (
+                  <div
+                    className="h-36 flex items-center justify-center text-xs"
+                    style={{ background: 'var(--chr-bg)', borderBottom: '1px solid var(--chr-border)', color: '#C0BDB7' }}
+                  >
+                    Aucune photo
+                  </div>
+                )}
 
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-2">

@@ -60,13 +60,39 @@ export default async function AnnonceDetail({ params }: { params: Promise<{ id: 
         <div className="rounded-xl overflow-hidden" style={{ background: 'var(--chr-card)', border: '1px solid var(--chr-border)' }}>
 
           {/* Zone photo */}
-          <div
+        {annonce.photos && annonce.photos.length > 0 ? (
+        <div>
+            <img
+            src={annonce.photos[0]}
+            alt={annonce.titre}
+            className="w-full object-cover"
+            style={{ maxHeight: '400px', borderBottom: '1px solid var(--chr-border)' }}
+            />
+            {annonce.photos.length > 1 && (
+            <div
+                className="flex gap-2 p-3"
+                style={{ borderBottom: '1px solid var(--chr-border)', background: 'var(--chr-bg)' }}
+            >
+                {annonce.photos.slice(1).map((url: string, i: number) => (
+                <img
+                    key={i}
+                    src={url}
+                    alt={`Photo ${i + 2}`}
+                    className="w-20 h-20 object-cover rounded-lg cursor-pointer"
+                    style={{ border: '1px solid var(--chr-border)' }}
+                />
+                ))}
+            </div>
+            )}
+        </div>
+        ) : (
+        <div
             className="h-64 flex items-center justify-center text-sm"
             style={{ background: 'var(--chr-bg)', borderBottom: '1px solid var(--chr-border)', color: '#C0BDB7' }}
-          >
+        >
             Aucune photo
-          </div>
-
+        </div>
+        )}
           <div className="p-8">
 
             {/* Badges */}
