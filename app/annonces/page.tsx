@@ -1,6 +1,15 @@
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
+const { data: annonces, error } = await supabase
+    .from('annonces')
+    .select('*')
+    .eq('active', true)
+    .order('created_at', { ascending: false })
+
+console.log('annonces:', annonces)
+console.log('error:', error)
+
 export default async function Annonces() {
   const { data: annonces, error } = await supabase
     .from('annonces')
