@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import PhotoGallery from './PhotoGallery'
 
 const etatStyle: Record<string, { bg: string, color: string }> = {
   'Neuf':          { bg: 'var(--chr-etat-neuf-bg)', color: 'var(--chr-etat-neuf-text)' },
@@ -60,39 +61,17 @@ export default async function AnnonceDetail({ params }: { params: Promise<{ id: 
         <div className="rounded-xl overflow-hidden" style={{ background: 'var(--chr-card)', border: '1px solid var(--chr-border)' }}>
 
           {/* Zone photo */}
-        {annonce.photos && annonce.photos.length > 0 ? (
-        <div>
-            <img
-            src={annonce.photos[0]}
-            alt={annonce.titre}
-            className="w-full object-cover"
-            style={{ maxHeight: '400px', borderBottom: '1px solid var(--chr-border)' }}
-            />
-            {annonce.photos.length > 1 && (
+          {annonce.photos && annonce.photos.length > 0 ? (
+            <PhotoGallery photos={annonce.photos} titre={annonce.titre} />
+          ) : (
             <div
-                className="flex gap-2 p-3"
-                style={{ borderBottom: '1px solid var(--chr-border)', background: 'var(--chr-bg)' }}
+              className="h-64 flex items-center justify-center text-sm"
+              style={{ background: 'var(--chr-bg)', borderBottom: '1px solid var(--chr-border)', color: '#C0BDB7' }}
             >
-                {annonce.photos.slice(1).map((url: string, i: number) => (
-                <img
-                    key={i}
-                    src={url}
-                    alt={`Photo ${i + 2}`}
-                    className="w-20 h-20 object-cover rounded-lg cursor-pointer"
-                    style={{ border: '1px solid var(--chr-border)' }}
-                />
-                ))}
+              Aucune photo
             </div>
-            )}
-        </div>
-        ) : (
-        <div
-            className="h-64 flex items-center justify-center text-sm"
-            style={{ background: 'var(--chr-bg)', borderBottom: '1px solid var(--chr-border)', color: '#C0BDB7' }}
-        >
-            Aucune photo
-        </div>
-        )}
+          )}
+
           <div className="p-8">
 
             {/* Badges */}
@@ -127,7 +106,6 @@ export default async function AnnonceDetail({ params }: { params: Promise<{ id: 
               <span>🗓 {new Date(annonce.created_at).toLocaleDateString('fr-FR')}</span>
             </div>
 
-            {/* Séparateur */}
             <div style={{ borderTop: '1px solid var(--chr-border)' }} className="mb-8" />
 
             {/* Description */}

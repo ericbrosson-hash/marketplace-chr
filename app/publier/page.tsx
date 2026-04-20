@@ -53,11 +53,14 @@ export default function Publier() {
     getUser()
   }, [router])
 
-  const handlePhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []).slice(0, 3)
-    setPhotos(files)
-    setPreviews(files.map(f => URL.createObjectURL(f)))
-  }
+const handlePhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = Array.from(e.target.files || [])
+  const newPhotos = [...photos, ...files].slice(0, 3)
+  setPhotos(newPhotos)
+  setPreviews(newPhotos.map(f => URL.createObjectURL(f)))
+  // Reset l'input pour permettre de resélectionner le même fichier
+  e.target.value = ''
+}
 
   const removePhoto = (index: number) => {
     const newPhotos = photos.filter((_, i) => i !== index)
@@ -150,47 +153,49 @@ export default function Publier() {
 
             {/* Photos */}
             <div>
-              <label style={labelStyle}>Photos (3 max)</label>
-              <div className="flex gap-3 mb-3">
+            <label style={labelStyle}>Photos (3 max)</label>
+            <div className="flex gap-3 mb-3">
                 {previews.map((src, i) => (
-                  <div key={i} className="relative">
+                <div key={i} className="relative">
                     <img
-                      src={src}
-                      alt={`Photo ${i + 1}`}
-                      className="w-24 h-24 object-cover rounded-lg"
-                      style={{ border: '1px solid var(--chr-border)' }}
+                    src={src}
+                    alt={`Photo ${i + 1}`}
+                    className="w-24 h-24 object-cover rounded-lg"
+                    style={{ border: '1px solid var(--chr-border)' }}
                     />
                     <button
-                      type="button"
-                      onClick={() => removePhoto(i)}
-                      className="absolute -top-2 -right-2 w-5 h-5 rounded-full text-xs flex items-center justify-center"
-                      style={{ background: '#1A1A1A', color: '#fff' }}
+                    type="button"
+                    onClick={() => removePhoto(i)}
+                    className="absolute -top-2 -right-2 w-5 h-5 rounded-full text-xs flex items-center justify-center"
+                    style={{ background: '#1A1A1A', color: '#fff' }}
                     >
-                      ×
+                    ×
                     </button>
-                  </div>
+                </div>
                 ))}
                 {previews.length < 3 && (
-                  <label
+                <label
                     className="w-24 h-24 rounded-lg flex flex-col items-center justify-center cursor-pointer text-xs gap-1"
                     style={{
-                      border: '1px dashed var(--chr-border)',
-                      background: 'var(--chr-bg)',
-                      color: 'var(--chr-muted)',
+                    border: '1px dashed var(--chr-border)',
+                    background: 'var(--chr-bg)',
+                    color: 'var(--chr-muted)',
                     }}
-                  >
+                >
                     <span style={{ fontSize: '20px' }}>+</span>
                     <span>Ajouter</span>
                     <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={handlePhotos}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotos}
                     />
-                  </label>
+                </label>
                 )}
-              </div>
+            </div>
+            <p className="text-xs" style={{ color: 'var(--chr-muted)' }}>
+                {previews.length}/3 photo{previews.length > 1 ? 's' : ''} — cliquez sur + pour ajouter une photo à la fois
+            </p>
             </div>
 
             <div style={{ borderTop: '1px solid var(--chr-border)', paddingTop: '20px' }}>
