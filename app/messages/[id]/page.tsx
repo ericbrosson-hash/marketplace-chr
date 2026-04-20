@@ -26,7 +26,6 @@ export default function Conversation({ params }: { params: Promise<{ id: string 
       if (!user) { router.push('/auth/connexion'); return }
       setUserId(user.id)
 
-      // Récupère l'annonce
       const { data: ann } = await supabase
         .from('annonces')
         .select('titre, ville, prix')
@@ -34,7 +33,6 @@ export default function Conversation({ params }: { params: Promise<{ id: string 
         .single()
       setAnnonce(ann)
 
-      // Récupère les messages de cette conversation
       const { data: msgs } = await supabase
         .from('messages')
         .select(`*, expediteur:profiles!expediteur_id (nom)`)
@@ -43,7 +41,6 @@ export default function Conversation({ params }: { params: Promise<{ id: string 
         .order('created_at', { ascending: true })
       setMessages(msgs || [])
 
-      // Marque les messages comme lus
       await supabase
         .from('messages')
         .update({ lu: true })
@@ -81,20 +78,45 @@ export default function Conversation({ params }: { params: Promise<{ id: string 
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-blue-600">CHR Occasion</Link>
-          <Link href="/messages" className="text-gray-600 hover:text-blue-600">← Mes messages</Link>
+    <main className="min-h-screen flex flex-col" style={{ background: 'var(--chr-bg)' }}>
+
+      {/* Navbar */}
+      <header style={{ background: 'var(--chr-navbar)' }}>
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full" style={{ background: 'var(--chr-accent)' }}></span>
+            <span className="text-sm font-semibold" style={{ color: 'var(--chr-text-inverse)' }}>CHR Occasion</span>
+          </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/annonces" className="text-sm" style={{ color: '#999' }}>Annonces</Link>
+            <Link href="/estimer" className="text-sm" style={{ color: '#999' }}>Estimer</Link>
+            <Link href="/messages" className="text-sm" style={{ color: '#fff' }}>← Mes messages</Link>
+            <Link
+              href="/publier"
+              className="text-sm font-semibold px-4 py-1.5 rounded-md"
+              style={{ background: 'var(--chr-accent)', color: 'var(--chr-accent-text)' }}
+            >
+              Publier une annonce
+            </Link>
+          </nav>
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 w-full flex flex-col flex-1">
+      <div className="max-w-2xl mx-auto px-6 py-6 w-full flex flex-col flex-1">
 
+        {/* Annonce */}
         {annonce && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-            <p className="font-semibold text-gray-800">{annonce.titre}</p>
-            <p className="text-gray-500 text-sm">📍 {annonce.ville} — {Number(annonce.prix).toLocaleString()} €</p>
+          <div
+            className="rounded-xl p-4 mb-5"
+            style={{ background: 'var(--chr-card)', border: '1px solid var(--chr-border)' }}
+          >
+            <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'var(--chr-muted)' }}>
+              Annonce
+            </p>
+            <p className="font-semibold text-sm" style={{ color: 'var(--chr-text)' }}>{annonce.titre}</p>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--chr-muted)' }}>
+              📍 {annonce.ville} — {Number(annonce.prix).toLocaleString('fr-FR')} €
+            </p>
           </div>
         )}
 
@@ -104,12 +126,31 @@ export default function Conversation({ params }: { params: Promise<{ id: string 
             const isMine = msg.expediteur_id === userId
             return (
               <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs rounded-2xl px-4 py-3 ${isMine ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 shadow-sm'}`}>
+                <div
+                  className="max-w-xs rounded-2xl px-4 py-3"
+                  style={{
+                    background: isMine ? 'var(--chr-btn)' : 'var(--chr-card)',
+                    border: isMine ? 'none' : '1px solid var(--chr-border)',
+                  }}
+                >
                   {!isMine && (
-                    <p className="text-xs font-medium text-blue-600 mb-1">{msg.expediteur?.nom || 'Pro CHR'}</p>
+                    <p
+                      className="text-xs font-medium mb-1"
+                      style={{ color: 'var(--chr-accent)' }}
+                    >
+                      {msg.expediteur?.nom || 'Pro CHR'}
+                    </p>
                   )}
-                  <p className="text-sm">{msg.contenu}</p>
-                  <p className={`text-xs mt-1 ${isMine ? 'text-blue-200' : 'text-gray-400'}`}>
+                  <p
+                    className="text-sm"
+                    style={{ color: isMine ? 'var(--chr-text-inverse)' : 'var(--chr-text)' }}
+                  >
+                    {msg.contenu}
+                  </p>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: isMine ? 'rgba(255,255,255,0.5)' : 'var(--chr-muted)' }}
+                  >
                     {new Date(msg.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
@@ -124,7 +165,17 @@ export default function Conversation({ params }: { params: Promise<{ id: string 
           <input
             type="text"
             placeholder="Votre message..."
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+            style={{
+              flex: 1,
+              border: '1px solid var(--chr-border)',
+              borderRadius: 'var(--chr-radius-sm)',
+              padding: '8px 14px',
+              fontSize: '14px',
+              color: 'var(--chr-text)',
+              background: 'var(--chr-card)',
+              outline: 'none',
+              fontFamily: 'inherit',
+            }}
             value={contenu}
             onChange={(e) => setContenu(e.target.value)}
             required
@@ -132,11 +183,13 @@ export default function Conversation({ params }: { params: Promise<{ id: string 
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="px-5 py-2 rounded-md text-sm font-semibold disabled:opacity-50"
+            style={{ background: 'var(--chr-btn)', color: 'var(--chr-btn-text)' }}
           >
             Envoyer
           </button>
         </form>
+
       </div>
     </main>
   )

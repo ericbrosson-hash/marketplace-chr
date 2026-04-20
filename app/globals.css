@@ -1,26 +1,52 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* === THÈME CHR OCCASION === */
+  /* Modifie uniquement ces variables pour changer tout le site */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Couleurs principales */
+  --chr-bg:           #F4F3F0;   /* fond de page */
+  --chr-card:         #ffffff;   /* fond des cards */
+  --chr-navbar:       #1A1A1A;   /* fond navbar */
+  --chr-border:       #E5E3DE;   /* bordures */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Textes */
+  --chr-text:         #1A1A1A;   /* texte principal */
+  --chr-muted:        #888888;   /* texte secondaire */
+  --chr-text-inverse: #ffffff;   /* texte sur fond sombre */
+
+  /* Accent */
+  --chr-accent:       #E8A020;   /* couleur d'accent (bouton CTA, dot logo) */
+  --chr-accent-text:  #1A1A1A;   /* texte sur bouton accent */
+
+  /* Bouton primaire */
+  --chr-btn:          #1A1A1A;   /* fond bouton principal */
+  --chr-btn-text:     #ffffff;   /* texte bouton principal */
+
+  /* États des annonces */
+  --chr-etat-neuf-bg:    #EAF3DE;
+  --chr-etat-neuf-text:  #3B6D11;
+  --chr-etat-tbe-bg:     #EAF3DE;
+  --chr-etat-tbe-text:   #3B6D11;
+  --chr-etat-be-bg:      #E6F1FB;
+  --chr-etat-be-text:    #185FA5;
+  --chr-etat-cor-bg:     #FAEEDA;
+  --chr-etat-cor-text:   #854F0B;
+  --chr-etat-pie-bg:     #FCEBEB;
+  --chr-etat-pie-text:   #A32D2D;
+
+  /* Rayons */
+  --chr-radius-sm:    6px;
+  --chr-radius-md:    10px;
+  --chr-radius-lg:    12px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--chr-bg);
+  color: var(--chr-text);
+  font-family: inherit;
+}
+
+* {
+  box-sizing: border-box;
 }

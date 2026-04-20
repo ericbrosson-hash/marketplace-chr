@@ -5,6 +5,29 @@ import { supabase } from '@/lib/supabase'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
+const inputStyle = {
+  width: '100%',
+  border: '1px solid var(--chr-border)',
+  borderRadius: 'var(--chr-radius-sm)',
+  padding: '8px 12px',
+  fontSize: '14px',
+  color: 'var(--chr-text)',
+  background: 'var(--chr-card)',
+  outline: 'none',
+  fontFamily: 'inherit',
+  resize: 'vertical' as const,
+}
+
+const labelStyle = {
+  display: 'block',
+  fontSize: '12px',
+  fontWeight: '500' as const,
+  color: 'var(--chr-muted)',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.05em',
+  marginBottom: '6px',
+}
+
 function NouveauMessageForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -58,51 +81,93 @@ function NouveauMessageForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Contacter le vendeur</h2>
+    <div className="max-w-2xl mx-auto px-6 py-8">
 
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold" style={{ color: 'var(--chr-text)' }}>
+          Contacter le vendeur
+        </h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--chr-muted)' }}>
+          Votre message sera transmis directement au vendeur
+        </p>
+      </div>
+
+      {/* Annonce concernée */}
       {annonce && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-          <p className="text-sm text-blue-600 font-medium">Annonce concernée</p>
-          <p className="font-semibold text-gray-800">{annonce.titre}</p>
-          <p className="text-gray-500 text-sm">📍 {annonce.ville} — {Number(annonce.prix).toLocaleString()} €</p>
+        <div
+          className="rounded-xl p-4 mb-6"
+          style={{ background: 'var(--chr-card)', border: '1px solid var(--chr-border)' }}
+        >
+          <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: 'var(--chr-muted)' }}>
+            Annonce concernée
+          </p>
+          <p className="font-semibold text-sm" style={{ color: 'var(--chr-text)' }}>{annonce.titre}</p>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--chr-muted)' }}>
+            📍 {annonce.ville} — {Number(annonce.prix).toLocaleString('fr-FR')} €
+          </p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
+      <div
+        className="rounded-xl p-6 space-y-4"
+        style={{ background: 'var(--chr-card)', border: '1px solid var(--chr-border)' }}
+      >
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Votre message *</label>
+          <label style={labelStyle}>Votre message *</label>
           <textarea
             rows={5}
             placeholder="Bonjour, je suis intéressé par votre annonce..."
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+            style={inputStyle}
             value={contenu}
             onChange={(e) => setContenu(e.target.value)}
             required
           />
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? 'Envoi en cours...' : 'Envoyer le message'}
-        </button>
-      </form>
+
+        <div style={{ borderTop: '1px solid var(--chr-border)', paddingTop: '16px' }}>
+          <button
+            type="button"
+            onClick={handleSubmit as any}
+            disabled={loading}
+            className="w-full py-3 rounded-md text-sm font-semibold disabled:opacity-50"
+            style={{ background: 'var(--chr-btn)', color: 'var(--chr-btn-text)' }}
+          >
+            {loading ? 'Envoi en cours...' : 'Envoyer le message'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
 
 export default function NouveauMessage() {
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-blue-600">CHR Occasion</Link>
-          <Link href="/annonces" className="text-gray-600 hover:text-blue-600">← Retour</Link>
+    <main className="min-h-screen" style={{ background: 'var(--chr-bg)' }}>
+      <header style={{ background: 'var(--chr-navbar)' }}>
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full" style={{ background: 'var(--chr-accent)' }}></span>
+            <span className="text-sm font-semibold" style={{ color: 'var(--chr-text-inverse)' }}>CHR Occasion</span>
+          </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/annonces" className="text-sm" style={{ color: '#999' }}>Annonces</Link>
+            <Link href="/estimer" className="text-sm" style={{ color: '#999' }}>Estimer</Link>
+            <Link href="/messages" className="text-sm" style={{ color: '#999' }}>Messages</Link>
+            <Link
+              href="/publier"
+              className="text-sm font-semibold px-4 py-1.5 rounded-md"
+              style={{ background: 'var(--chr-accent)', color: 'var(--chr-accent-text)' }}
+            >
+              Publier une annonce
+            </Link>
+          </nav>
         </div>
       </header>
-      <Suspense fallback={<div className="text-center py-20 text-gray-400">Chargement...</div>}>
+      <Suspense fallback={
+        <div className="text-center py-20 text-sm" style={{ color: 'var(--chr-muted)' }}>
+          Chargement...
+        </div>
+      }>
         <NouveauMessageForm />
       </Suspense>
     </main>

@@ -16,7 +16,6 @@ export default function Messages() {
       if (!user) { router.push('/auth/connexion'); return }
       setUserId(user.id)
 
-      // Récupère tous les messages où je suis impliqué
       const { data } = await supabase
         .from('messages')
         .select(`
@@ -28,7 +27,6 @@ export default function Messages() {
         .or(`expediteur_id.eq.${user.id},destinataire_id.eq.${user.id}`)
         .order('created_at', { ascending: false })
 
-      // Dédoublonne par annonce_id pour avoir une conversation par annonce
       const seen = new Set()
       const convs = (data || []).filter((msg: any) => {
         const key = msg.annonce_id
@@ -44,51 +42,103 @@ export default function Messages() {
   }, [router])
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-blue-600">CHR Occasion</Link>
+    <main className="min-h-screen" style={{ background: 'var(--chr-bg)' }}>
+
+      {/* Navbar */}
+      <header style={{ background: 'var(--chr-navbar)' }}>
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full" style={{ background: 'var(--chr-accent)' }}></span>
+            <span className="text-sm font-semibold" style={{ color: 'var(--chr-text-inverse)' }}>CHR Occasion</span>
+          </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/annonces" className="text-sm" style={{ color: '#999' }}>Annonces</Link>
+            <Link href="/estimer" className="text-sm" style={{ color: '#999' }}>Estimer</Link>
+            <Link href="/messages" className="text-sm" style={{ color: '#fff' }}>Messages</Link>
+            <Link
+              href="/publier"
+              className="text-sm font-semibold px-4 py-1.5 rounded-md"
+              style={{ background: 'var(--chr-accent)', color: 'var(--chr-accent-text)' }}
+            >
+              Publier une annonce
+            </Link>
+          </nav>
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Mes messages</h2>
+      <div className="max-w-2xl mx-auto px-6 py-8">
 
-        {loading && <p className="text-gray-400">Chargement...</p>}
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold" style={{ color: 'var(--chr-text)' }}>Mes messages</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--chr-muted)' }}>
+            {conversations.length} conversation{conversations.length > 1 ? 's' : ''}
+          </p>
+        </div>
+
+        {loading && (
+          <p className="text-sm" style={{ color: 'var(--chr-muted)' }}>Chargement...</p>
+        )}
 
         {!loading && conversations.length === 0 && (
-          <div className="text-center py-20 text-gray-400">
-            <p className="text-xl">Aucun message pour le moment</p>
+          <div className="text-center py-24" style={{ color: 'var(--chr-muted)' }}>
+            <p className="text-lg font-medium mb-2">Aucun message pour le moment</p>
+            <p className="text-sm">Contactez un vendeur depuis une annonce pour démarrer une conversation</p>
           </div>
         )}
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {conversations.map((conv) => {
             const interlocuteur = conv.expediteur_id === userId
               ? conv.destinataire?.nom
               : conv.expediteur?.nom
+            const isUnread = !conv.lu && conv.destinataire_id === userId
+
             return (
               <Link
                 key={conv.annonce_id}
                 href={`/messages/${conv.annonce_id}?interlocuteur=${conv.expediteur_id === userId ? conv.destinataire_id : conv.expediteur_id}`}
-                className="block bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-5"
+                className="block rounded-xl transition-shadow hover:shadow-sm"
+                style={{
+                  background: 'var(--chr-card)',
+                  border: '1px solid var(--chr-border)',
+                  padding: '16px 20px',
+                }}
               >
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start mb-2">
                   <div>
-                    <p className="font-semibold text-gray-800">{conv.annonces?.titre}</p>
-                    <p className="text-sm text-gray-500">📍 {conv.annonces?.ville}</p>
-                    <p className="text-sm text-blue-600 mt-1">Avec : {interlocuteur || 'Pro CHR'}</p>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--chr-text)' }}>
+                      {conv.annonces?.titre}
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--chr-muted)' }}>
+                      📍 {conv.annonces?.ville}
+                    </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-400">
+                  <div className="flex items-center gap-2">
+                    {isUnread && (
+                      <span
+                        className="text-xs font-medium px-2 py-0.5 rounded-full"
+                        style={{ background: 'var(--chr-accent)', color: 'var(--chr-accent-text)' }}
+                      >
+                        Nouveau
+                      </span>
+                    )}
+                    <p className="text-xs" style={{ color: 'var(--chr-muted)' }}>
                       {new Date(conv.created_at).toLocaleDateString('fr-FR')}
                     </p>
-                    {!conv.lu && conv.destinataire_id === userId && (
-                      <span className="inline-block mt-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">Nouveau</span>
-                    )}
                   </div>
                 </div>
-                <p className="text-gray-500 text-sm mt-2 line-clamp-1">{conv.contenu}</p>
+
+                <div
+                  className="flex items-center justify-between pt-2"
+                  style={{ borderTop: '1px solid var(--chr-border)' }}
+                >
+                  <p className="text-xs font-medium" style={{ color: 'var(--chr-muted)' }}>
+                    Avec : <span style={{ color: 'var(--chr-text)' }}>{interlocuteur || 'Pro CHR'}</span>
+                  </p>
+                  <p className="text-xs line-clamp-1 max-w-xs text-right" style={{ color: 'var(--chr-muted)' }}>
+                    {conv.contenu}
+                  </p>
+                </div>
               </Link>
             )
           })}

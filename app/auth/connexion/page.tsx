@@ -1,8 +1,30 @@
- 'use client'
+'use client'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+
+const inputStyle = {
+  width: '100%',
+  border: '1px solid var(--chr-border)',
+  borderRadius: 'var(--chr-radius-sm)',
+  padding: '8px 12px',
+  fontSize: '14px',
+  color: 'var(--chr-text)',
+  background: 'var(--chr-card)',
+  outline: 'none',
+  fontFamily: 'inherit',
+}
+
+const labelStyle = {
+  display: 'block',
+  fontSize: '12px',
+  fontWeight: '500' as const,
+  color: 'var(--chr-muted)',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.05em',
+  marginBottom: '6px',
+}
 
 export default function Connexion() {
   const router = useRouter()
@@ -29,28 +51,41 @@ export default function Connexion() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white rounded-xl shadow-sm p-8 w-full max-w-md">
-        <Link href="/" className="text-2xl font-bold text-blue-600 block text-center mb-6">
-          CHR Occasion
+    <main
+      className="min-h-screen flex items-center justify-center"
+      style={{ background: 'var(--chr-bg)' }}
+    >
+      <div
+        className="w-full max-w-md rounded-xl p-8"
+        style={{ background: 'var(--chr-card)', border: '1px solid var(--chr-border)' }}
+      >
+
+        {/* Logo */}
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
+          <span className="w-2 h-2 rounded-full" style={{ background: 'var(--chr-accent)' }}></span>
+          <span className="font-semibold text-sm" style={{ color: 'var(--chr-text)' }}>CHR Occasion</span>
         </Link>
-        <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
+
+        <h1 className="text-xl font-semibold text-center mb-6" style={{ color: 'var(--chr-text)' }}>
           Se connecter
-        </h2>
+        </h1>
 
         {message && (
-          <div className="bg-red-50 text-red-700 p-3 rounded-lg mb-4 text-sm">
+          <div
+            className="p-3 rounded-md text-sm mb-4"
+            style={{ background: 'var(--chr-etat-pie-bg)', color: 'var(--chr-etat-pie-text)' }}
+          >
             {message}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+            <label style={labelStyle}>Email *</label>
             <input
               type="email"
               placeholder="jean@restaurant.fr"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+              style={inputStyle}
               value={form.email}
               onChange={(e) => setForm({...form, email: e.target.value})}
               required
@@ -58,11 +93,11 @@ export default function Connexion() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe *</label>
+            <label style={labelStyle}>Mot de passe *</label>
             <input
               type="password"
               placeholder="Votre mot de passe"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+              style={inputStyle}
               value={form.password}
               onChange={(e) => setForm({...form, password: e.target.value})}
               required
@@ -72,18 +107,22 @@ export default function Connexion() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
+            className="w-full py-3 rounded-md text-sm font-semibold disabled:opacity-50"
+            style={{ background: 'var(--chr-btn)', color: 'var(--chr-btn-text)' }}
           >
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Pas encore de compte ?{' '}
-          <Link href="/auth/inscription" className="text-blue-600 hover:underline">
-            S'inscrire
-          </Link>
-        </p>
+        <div style={{ borderTop: '1px solid var(--chr-border)', marginTop: '24px', paddingTop: '20px' }}>
+          <p className="text-center text-sm" style={{ color: 'var(--chr-muted)' }}>
+            Pas encore de compte ?{' '}
+            <Link href="/auth/inscription" style={{ color: 'var(--chr-text)', fontWeight: '500' }}>
+              S'inscrire
+            </Link>
+          </p>
+        </div>
+
       </div>
     </main>
   )
