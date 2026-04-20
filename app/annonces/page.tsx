@@ -52,9 +52,9 @@ export default async function Annonces() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {annonces?.map((annonce) => (
-            <div key={annonce.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+            <Link key={annonce.id} href={`/annonces/${annonce.id}`} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 block">
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
                   {annonce.categorie}
@@ -66,7 +66,7 @@ export default async function Annonces() {
               <h3 className="font-semibold text-gray-800 mt-3 mb-2">
                 {annonce.titre}
               </h3>
-              <p className="text-gray-500 text-sm mb-2">
+              <p className="text-gray-500 text-sm mb-2 line-clamp-2">
                 {annonce.description}
               </p>
               <p className="text-gray-500 text-sm mb-4">📍 {annonce.ville}</p>
@@ -74,11 +74,11 @@ export default async function Annonces() {
                 <span className="text-2xl font-bold text-blue-600">
                   {Number(annonce.prix).toLocaleString()}€
                 </span>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
-                  Contacter
-                </button>
+                <span className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                  Voir l'annonce →
+                </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
