@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
 export default function Publier() {
@@ -12,10 +13,26 @@ export default function Publier() {
     description: '',
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  
+  const { error } = await supabase
+    .from('annonces')
+    .insert([{
+      titre: form.titre,
+      categorie: form.categorie,
+      etat: form.etat,
+      prix: Number(form.prix),
+      ville: form.ville,
+      description: form.description,
+    }])
+
+  if (error) {
+    alert('Erreur : ' + error.message)
+  } else {
     alert('Annonce publiée avec succès !')
   }
+}
 
   return (
     <main className="min-h-screen bg-gray-50">

@@ -1,48 +1,15 @@
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
-const annonces = [
-  {
-    id: 1,
-    titre: "Four Rational SCC61 occasion",
-    prix: 2500,
-    ville: "Lyon",
-    categorie: "Cuisson",
-    etat: "Bon état",
-    emoji: "🔥"
-  },
-  {
-    id: 2,
-    titre: "Armoire réfrigérée Mercatus 400L",
-    prix: 800,
-    ville: "Paris",
-    categorie: "Réfrigération",
-    etat: "Très bon état",
-    emoji: "❄️"
-  },
-  {
-    id: 3,
-    titre: "Lave-vaisselle professionnel Hobart",
-    prix: 1200,
-    ville: "Marseille",
-    categorie: "Laverie",
-    etat: "Bon état",
-    emoji: "🫧"
-  },
-  {
-    id: 4,
-    titre: "Trancheuse Berkel 250mm",
-    prix: 450,
-    ville: "Bordeaux",
-    categorie: "Préparation",
-    etat: "Correct",
-    emoji: "🔪"
-  },
-]
+export default async function Annonces() {
+  const { data: annonces, error } = await supabase
+    .from('annonces')
+    .select('*')
+    .eq('active', true)
+    .order('created_at', { ascending: false })
 
-export default function Annonces() {
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="text-2xl font-bold text-blue-600">
@@ -56,7 +23,7 @@ export default function Annonces() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {annonces.length} annonces disponibles
+          {annonces?.length || 0} annonces disponibles
         </h2>
 
         {/* Filtres */}
@@ -72,10 +39,22 @@ export default function Annonces() {
         </div>
 
         {/* Liste annonces */}
+        {error && (
+          <p className="text-red-500">Erreur de chargement des annonces</p>
+        )}
+
+        {annonces?.length === 0 && (
+          <div className="text-center py-20 text-gray-400">
+            <p className="text-xl">Aucune annonce pour le moment</p>
+            <Link href="/publier" className="mt-4 inline-block bg-blue-600 text-white px-6 py-3 rounded-lg">
+              Publier la première annonce
+            </Link>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {annonces.map((annonce) => (
+          {annonces?.map((annonce) => (
             <div key={annonce.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
-              <div className="text-5xl mb-4 text-center">{annonce.emoji}</div>
               <div className="flex justify-between items-start mb-2">
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
                   {annonce.categorie}
@@ -87,10 +66,13 @@ export default function Annonces() {
               <h3 className="font-semibold text-gray-800 mt-3 mb-2">
                 {annonce.titre}
               </h3>
+              <p className="text-gray-500 text-sm mb-2">
+                {annonce.description}
+              </p>
               <p className="text-gray-500 text-sm mb-4">📍 {annonce.ville}</p>
               <div className="flex justify-between items-center">
                 <span className="text-2xl font-bold text-blue-600">
-                  {annonce.prix.toLocaleString()}€
+                  {Number(annonce.prix).toLocaleString()}€
                 </span>
                 <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
                   Contacter
