@@ -1,6 +1,15 @@
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
+export const revalidate = 0
+
+const etatStyle: Record<string, { bg: string, color: string }> = {
+  'Neuf':          { bg: 'var(--chr-etat-neuf-bg)', color: 'var(--chr-etat-neuf-text)' },
+  'Très bon état': { bg: 'var(--chr-etat-tbe-bg)',  color: 'var(--chr-etat-tbe-text)' },
+  'Bon état':      { bg: 'var(--chr-etat-be-bg)',   color: 'var(--chr-etat-be-text)' },
+  'Correct':       { bg: 'var(--chr-etat-cor-bg)',  color: 'var(--chr-etat-cor-text)' },
+  'Pour pièces':   { bg: 'var(--chr-etat-pie-bg)',  color: 'var(--chr-etat-pie-text)' },
+}
 
 export default async function Annonces() {
   const { data: annonces, error } = await supabase
@@ -10,77 +19,142 @@ export default async function Annonces() {
     .order('created_at', { ascending: false })
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-blue-600">
-            CHR Occasion
+    <main className="min-h-screen" style={{ background: 'var(--chr-bg)' }}>
+
+      {/* Navbar */}
+      <header style={{ background: 'var(--chr-navbar)' }}>
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full" style={{ background: 'var(--chr-accent)' }}></span>
+            <span className="text-sm font-semibold" style={{ color: 'var(--chr-text-inverse)' }}>CHR Occasion</span>
           </Link>
-          <Link href="/publier" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            Publier une annonce
-          </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/annonces" className="text-sm" style={{ color: '#fff' }}>Annonces</Link>
+            <Link href="/estimer" className="text-sm" style={{ color: '#999' }}>Estimer</Link>
+            <Link href="/messages" className="text-sm" style={{ color: '#999' }}>Messages</Link>
+            <Link
+              href="/publier"
+              className="text-sm font-semibold px-4 py-1.5 rounded-md"
+              style={{ background: 'var(--chr-accent)', color: 'var(--chr-accent-text)' }}
+            >
+              Publier une annonce
+            </Link>
+          </nav>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          {annonces?.length || 0} annonces disponibles
-        </h2>
+      {/* Hero bar */}
+      <div style={{ background: '#fff', borderBottom: '1px solid var(--chr-border)' }}>
+        <div className="max-w-6xl mx-auto px-6 py-5">
+          <h1 className="text-xl font-semibold" style={{ color: 'var(--chr-text)' }}>
+            Matériel CHR d'occasion
+          </h1>
+          <p className="text-sm mt-0.5" style={{ color: 'var(--chr-muted)' }}>
+            {annonces?.length || 0} annonces disponibles entre professionnels
+          </p>
+        </div>
+      </div>
 
-        {/* Filtres */}
-        <div className="flex gap-3 mb-8 flex-wrap">
-          {["Tous", "Cuisson", "Réfrigération", "Laverie", "Préparation", "Mobilier", "Bar"].map((cat) => (
+      {/* Filtres */}
+      <div style={{ background: 'var(--chr-bg)', borderBottom: '1px solid var(--chr-border)' }}>
+        <div className="max-w-6xl mx-auto px-6 py-3 flex gap-2 flex-wrap">
+          {["Tous", "Cuisson", "Réfrigération", "Laverie", "Préparation", "Mobilier", "Bar", "Caisse"].map((cat) => (
             <button
               key={cat}
-              className="px-4 py-2 rounded-full border border-gray-300 text-gray-600 hover:border-blue-600 hover:text-blue-600 bg-white"
+              className="text-xs font-medium px-3 py-1.5 rounded-full border"
+              style={{ background: '#fff', borderColor: 'var(--chr-border)', color: '#555' }}
             >
               {cat}
             </button>
           ))}
         </div>
+      </div>
 
-        {/* Liste annonces */}
+      {/* Contenu */}
+      <div className="max-w-6xl mx-auto px-6 py-6">
+
         {error && (
-          <p className="text-red-500">Erreur de chargement des annonces</p>
+          <p className="text-sm" style={{ color: 'var(--chr-etat-pie-text)' }}>
+            Erreur de chargement des annonces
+          </p>
         )}
 
         {annonces?.length === 0 && (
-          <div className="text-center py-20 text-gray-400">
-            <p className="text-xl">Aucune annonce pour le moment</p>
-            <Link href="/publier" className="mt-4 inline-block bg-blue-600 text-white px-6 py-3 rounded-lg">
+          <div className="text-center py-24" style={{ color: 'var(--chr-muted)' }}>
+            <p className="text-lg font-medium mb-4">Aucune annonce pour le moment</p>
+            <Link
+              href="/publier"
+              className="text-sm font-semibold px-6 py-2.5 rounded-md inline-block"
+              style={{ background: 'var(--chr-btn)', color: 'var(--chr-btn-text)' }}
+            >
               Publier la première annonce
             </Link>
           </div>
         )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {annonces?.map((annonce) => (
-            <Link key={annonce.id} href={`/annonces/${annonce.id}`} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 block">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                  {annonce.categorie}
-                </span>
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                  {annonce.etat}
-                </span>
-              </div>
-              <h3 className="font-semibold text-gray-800 mt-3 mb-2">
-                {annonce.titre}
-              </h3>
-              <p className="text-gray-500 text-sm mb-2 line-clamp-2">
-                {annonce.description}
-              </p>
-              <p className="text-gray-500 text-sm mb-4">📍 {annonce.ville}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-2xl font-bold text-blue-600">
-                  {Number(annonce.prix).toLocaleString()}€
-                </span>
-                <span className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-                  Voir l'annonce →
-                </span>
-              </div>
-            </Link>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {annonces?.map((annonce) => {
+            const etat = etatStyle[annonce.etat] || { bg: 'var(--chr-bg)', color: '#555' }
+            return (
+              <Link
+                key={annonce.id}
+                href={`/annonces/${annonce.id}`}
+                className="block rounded-xl overflow-hidden transition-shadow hover:shadow-md"
+                style={{ background: 'var(--chr-card)', border: '1px solid var(--chr-border)' }}
+              >
+                {/* Zone photo */}
+                <div
+                  className="h-36 flex items-center justify-center text-xs"
+                  style={{ background: 'var(--chr-bg)', borderBottom: '1px solid var(--chr-border)', color: '#C0BDB7' }}
+                >
+                  Aucune photo
+                </div>
+
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span
+                      className="text-xs font-medium px-2 py-0.5 rounded"
+                      style={{ background: 'var(--chr-bg)', color: '#555', border: '1px solid var(--chr-border)' }}
+                    >
+                      {annonce.categorie}
+                    </span>
+                    <span
+                      className="text-xs font-medium px-2 py-0.5 rounded"
+                      style={{ background: etat.bg, color: etat.color }}
+                    >
+                      {annonce.etat}
+                    </span>
+                  </div>
+
+                  <h3 className="font-semibold text-sm mb-1 leading-snug" style={{ color: 'var(--chr-text)' }}>
+                    {annonce.titre}
+                  </h3>
+
+                  <p className="text-xs mb-3 line-clamp-2" style={{ color: 'var(--chr-muted)' }}>
+                    {annonce.description}
+                  </p>
+
+                  <div
+                    className="flex items-center justify-between pt-3"
+                    style={{ borderTop: '1px solid var(--chr-border)' }}
+                  >
+                    <div>
+                      <span className="text-lg font-semibold" style={{ color: 'var(--chr-text)' }}>
+                        {Number(annonce.prix).toLocaleString('fr-FR')} €
+                      </span>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--chr-muted)' }}>📍 {annonce.ville}</p>
+                    </div>
+                    <span
+                      className="text-xs font-medium px-3 py-1.5 rounded-md"
+                      style={{ background: 'var(--chr-btn)', color: 'var(--chr-btn-text)' }}
+                    >
+                      Voir →
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
         </div>
       </div>
     </main>
