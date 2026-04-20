@@ -41,6 +41,13 @@ export default function Messages() {
     init()
   }, [router])
 
+  const IconPin = () => (
+    <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" style={{ display: 'inline', marginRight: '3px', verticalAlign: 'middle' }}>
+      <path d="M12 2C8.686 2 6 4.686 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.314-2.686-6-6-6z"/>
+      <circle cx="12" cy="8" r="2"/>
+    </svg>
+  )
+
   return (
     <main className="min-h-screen" style={{ background: 'var(--chr-bg)' }}>
 
@@ -110,7 +117,7 @@ export default function Messages() {
                       {conv.annonces?.titre}
                     </p>
                     <p className="text-xs mt-0.5" style={{ color: 'var(--chr-muted)' }}>
-                      📍 {conv.annonces?.ville}
+                      <IconPin />{conv.annonces?.ville}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
